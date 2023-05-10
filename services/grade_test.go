@@ -6,26 +6,31 @@ import (
 	"github.com/nattrio/go-demo-unit-test/services"
 )
 
-func TestCheckGradeA(t *testing.T) {
-	grade := services.CheckGrade(80)
-	expected := "A"
-	if grade != expected {
-		t.Errorf("Expected %s, got %s", expected, grade)
-	}
-}
+func TestCheckGrade(t *testing.T) {
 
-func TestCheckGradeB(t *testing.T) {
-	grade := services.CheckGrade(70)
-	expected := "B"
-	if grade != expected {
-		t.Errorf("Expected %s, got %s", expected, grade)
+	type testCase struct {
+		name     string
+		score    int
+		expected string
 	}
-}
 
-func TestCheckGradeC(t *testing.T) {
-	grade := services.CheckGrade(60)
-	expected := "C"
-	if grade != expected {
-		t.Errorf("Expected %s, got %s", expected, grade)
+	cases := []testCase{
+		{name: "A", score: 80, expected: "A"},
+		{name: "B", score: 70, expected: "B"},
+		{name: "C", score: 60, expected: "C"},
+		{name: "D", score: 50, expected: "D"},
+		{name: "F", score: 40, expected: "F"},
 	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			grade := services.CheckGrade(c.score)
+			expected := c.expected
+
+			if grade != expected {
+				t.Errorf("Expected %s, got %s", expected, grade)
+			}
+		})
+	}
+
 }
