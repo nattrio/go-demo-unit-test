@@ -1,6 +1,7 @@
 package services_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/nattrio/go-demo-unit-test/repositories"
@@ -64,5 +65,19 @@ func TestPromotionCalculateDiscount(t *testing.T) {
 		// Assert
 		assert.ErrorIs(t, err, services.ErrZeroAmount)
 		promoRepo.AssertNotCalled(t, "GetPromotion") // Assert that GetPromotion is not called
+	})
+
+	t.Run("Repository error", func(t *testing.T) {
+		// Arange
+		promoRepo := repositories.NewPromotionRepositoryMock()
+		promoRepo.On("GetPromotion").Return(repositories.Promotion{}, errors.New(""))
+
+		promoService := services.NewPromotionService(promoRepo)
+
+		// Act
+		_, err := promoService.CalculateDiscount(100)
+
+		// Assert
+		assert.ErrorIs(t, err, services.ErrRepository)
 	})
 }
