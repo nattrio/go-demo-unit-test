@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/nattrio/go-demo-unit-test/services"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckGrade(t *testing.T) {
@@ -26,11 +27,8 @@ func TestCheckGrade(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			grade := services.CheckGrade(c.score)
-			expected := c.expected
 
-			if grade != expected {
-				t.Errorf("Expected %s, got %s", expected, grade)
-			}
+			assert.Equal(t, c.expected, grade)
 		})
 	}
 
