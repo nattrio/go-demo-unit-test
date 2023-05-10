@@ -1,6 +1,7 @@
 package services_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/nattrio/go-demo-unit-test/services"
@@ -39,4 +40,10 @@ func BenchmarkCheckGrade(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		services.CheckGrade(80)
 	}
+}
+
+func ExampleCheckGrade() {
+	grade := services.CheckGrade(80)
+	fmt.Println(grade)
+	// Output: A
 }
