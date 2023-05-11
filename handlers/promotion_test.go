@@ -25,6 +25,7 @@ func TestPromotionHandlerCalculateDiscount(t *testing.T) {
 
 		promoHandler := handlers.NewPromotionHandler(promoService)
 
+		// http://localhost:8000/calculatediscount?amount=100
 		app := fiber.New()
 		app.Get("/calculate", promoHandler.CalculateDiscount)
 

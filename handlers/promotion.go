@@ -21,7 +21,6 @@ func NewPromotionHandler(promoService services.PromotionService) PromotionHandle
 }
 
 func (h promotionHandler) CalculateDiscount(c *fiber.Ctx) error {
-	// http://localhost:8000/calculatediscount?amount=100
 
 	amountStr := c.Query("amount")
 	amount, err := strconv.Atoi(amountStr)
