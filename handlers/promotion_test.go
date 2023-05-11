@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,8 +37,30 @@ func TestPromotionHandlerCalculateDiscount(t *testing.T) {
 		if assert.Equal(t, fiber.StatusOK, res.StatusCode) {
 			// If status code is OK, then we can read the response body
 			body, _ := io.ReadAll(res.Body)
-			assert.Equal(t, "strconv.Itoa(expected)", string(body))
+			assert.Equal(t, strconv.Itoa(expected), string(body))
 		}
+
+		t.Run("Bad Request", func(t *testing.T) {
+
+			// Arange
+			amount := "abc"
+
+			promoService := services.NewPromotionServiceMock()
+
+			promoHandler := handlers.NewPromotionHandler(promoService)
+
+			app := fiber.New()
+			app.Get("/calculate", promoHandler.CalculateDiscount)
+
+			req := httptest.NewRequest("GET", fmt.Sprintf("/calculate?amount=%v", amount), nil)
+
+			// Act
+			res, _ := app.Test(req)
+
+			// Assert
+			assert.Equal(t, fiber.StatusBadRequest, res.StatusCode)
+
+		})
 
 	})
 }
