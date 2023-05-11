@@ -21,7 +21,7 @@ func TestPromotionHandlerCalculateDiscount(t *testing.T) {
 		expected := 80
 
 		promoService := services.NewPromotionServiceMock()
-		promoService.On("CalculateDiscount", amount).Return(expected, nil)
+		promoService.On("CalculateDiscount", amount).Return(expected, nil) // mock the CalculateDiscount method
 
 		promoHandler := handlers.NewPromotionHandler(promoService)
 
@@ -39,28 +39,47 @@ func TestPromotionHandlerCalculateDiscount(t *testing.T) {
 			body, _ := io.ReadAll(res.Body)
 			assert.Equal(t, strconv.Itoa(expected), string(body))
 		}
+	})
 
-		t.Run("Bad Request", func(t *testing.T) {
+	t.Run("Bad Request", func(t *testing.T) {
 
-			// Arange
-			amount := "abc"
+		// Arange
+		amount := "abc"
 
-			promoService := services.NewPromotionServiceMock()
+		promoService := services.NewPromotionServiceMock()
+		promoHandler := handlers.NewPromotionHandler(promoService)
 
-			promoHandler := handlers.NewPromotionHandler(promoService)
+		app := fiber.New()
+		app.Get("/calculate", promoHandler.CalculateDiscount)
 
-			app := fiber.New()
-			app.Get("/calculate", promoHandler.CalculateDiscount)
+		req := httptest.NewRequest("GET", fmt.Sprintf("/calculate?amount=%v", amount), nil)
 
-			req := httptest.NewRequest("GET", fmt.Sprintf("/calculate?amount=%v", amount), nil)
+		// Act
+		res, _ := app.Test(req)
 
-			// Act
-			res, _ := app.Test(req)
+		// Assert
+		assert.Equal(t, fiber.StatusBadRequest, res.StatusCode)
+	})
 
-			// Assert
-			assert.Equal(t, fiber.StatusBadRequest, res.StatusCode)
+	t.Run("Not Found", func(t *testing.T) {
 
-		})
+		// Arange
+		amount := 100
 
+		promoService := services.NewPromotionServiceMock()
+		promoService.On("CalculateDiscount", amount).Return(0, fmt.Errorf("Not Found"))
+
+		promoHandler := handlers.NewPromotionHandler(promoService)
+
+		app := fiber.New()
+		app.Get("/calculate", promoHandler.CalculateDiscount)
+
+		req := httptest.NewRequest("GET", fmt.Sprintf("/calculate?amount=%v", amount), nil)
+
+		// Act
+		res, _ := app.Test(req)
+
+		// Assert
+		assert.Equal(t, fiber.StatusNotFound, res.StatusCode)
 	})
 }
